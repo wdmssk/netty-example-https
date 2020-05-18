@@ -1,22 +1,15 @@
-# How to Create a HTTPS Server with Netty
+# HTTPS/SSL Server Using Netty
 
 
-## 1. Short description
+## 1. Description
 
-Best practices for certificates and security [[1](README.md#6-references), [2](README.md#6-references)] dictate that private keys should be secured.
-HSM (hardware security module), secret manager, and keystore files can be used to secure the keys.
-Keystore files are the de-facto “secrets repository” for Java/JVM-based applications.
-This project is an implementation of Netty HTTPS/SSL server using keystore files.
+The repo includes:
+* notes on certificates and security best practices
+* implementation of a Netty HTTPS/SSL server for reference
 
-The following topics provide the information necessary to create a Netty https server based on best practices for certificates and security.
-The project is largely based on the example code that comes with Netty source code [[3](README.md#6-references)].
-Minimal code to load the keystore was added to example code to be used as a reference.
-
-Other relevant certificates and security best practices [[1](README.md#6-references), [2](README.md#6-references), [4](README.md#6-references), [5](README.md#6-references)] include:
-
-- Do not package keystore files and keystore configuration files (including passwords) inside Jar files/application archive files.
-- Use standard operating system access security protocols to protect keystore files and keystore configuration files (including passwords).
-- Use the PKCS12 Format for keystores.
+The code is based on the example [source code that comes with Netty](https://github.com/netty/netty/tree/4.1/example/src/main/java/io/netty/example/http/helloworld).
+This is just a personal project created for learning and testing.
+If you have any question or comment, please use the Issues tab of this git repo.
 
 
 ## 2. Quick Start: Running the Project (As-Is).
@@ -28,24 +21,37 @@ To install the certificate in Mozilla Firefox:
 - Navigate to where you stored the certificate (*src/main/resources/security/* folder in the project), select the certificate file (*ca_netty.pem*).
 
 You need JDK 1.8. Once you have retrieved the project, go to the project root directory and launch the server with:
-
 ```shell
 ./gradlew run
 ```
 
 Access *https://localhost:8443* (or *https://127.0.0.1:8443*) in the browser.
-If everything goes well one should see a "Hello world!" message in your browser and a gray padlock (indicating a trustworthy SSL/TLS connection) [[6](README.md#6-references)].  
+If everything goes well one should see a "Hello world!" message in your browser and a gray padlock (indicating a trustworthy SSL/TLS connection) [[5](README.md#4-references)].
 If something went wrong, the browser will display the "Warning: Potential Security Risk Ahead" error page with error codes (that should help to trace the error's cause.).
 
-This is just a personal project created for study/test purpose.
-So in order to provide a quick start, the *src/main/resources/security* directory was included in the project despite its presence violates some of the before mentioned best practices.
-A production project should __NOT__ contain keystore or keystore configuration parameters, but this directory contains the keystore (*svr_netty.p12* - containing the server private key, and certificate), and Keystore configuration file (*config.properties*).
+The *src/main/resources/security* directory contains the keystore (*svr_netty.p12* - containing the server private key, and certificate), and Keystore configuration file (*config.properties*).
+Despite the inclusion of this directory in the project is against the best practices, the directory was included in the project to allow quick testing.
+A production project __SHOULD NOT INCLUDE__ keystore or keystore configuration parameters.
 
-The keys, certificates, and keystore in *src/main/resources/security* directory were generated as described in section 4.
+The keys, certificates, and keystore in *src/main/resources/security* directory were generated as described in section 3.2.
 
 
-## 3. How to to Create a Netty https Server
+## 3. Security Best Practices and Netty https Server
 
+Best practices for certificates and security [[1](README.md#4-references), [2](README.md#4-references)] is to secure the private keys.
+HSM (hardware security module), secret manager, and keystore files can be used to secure the keys.
+Keystore files are the de-facto “secrets repository” for Java/JVM-based applications.
+
+Other relevant certificates and security best practices [[1](README.md#4-references), [2](README.md#4-references), [3](README.md#4-references), [4](README.md#4-references)] include:
+- Do not package keystore files and keystore configuration files (including passwords) inside Jar files/application archive files.
+- Use standard operating system access security protocols to protect keystore files and keystore configuration files (including passwords).
+- Use the PKCS12 Format for keystores.
+
+The repository source code is intended to be used as reference for implementing a Netty HTTPS/SSL server using keystore.
+The following topics provide additional information necessary to implement a Netty https server based on best practices.
+
+
+### 3.1 How to to Create a Netty https Server
 To create a Netty https server, the following is required:
 
 - Keystore with server private key and certificate signed by CA. In the project, *src/main/resources/security/svr_netty.p12* is the keystore file.
@@ -84,10 +90,10 @@ The key and certificate can be imported using the OpenSSL:
 openssl pkcs12 -export -name netty -inkey svr_key.pem -in svr_netty.pem -out svr_netty.p12 -passin pass:$SVR_KEY_PWD -passout pass:$STORE_PWD
 ```
 
-**Note:** : The keystore only worked for me when the key password (`$SVR_KEY_PWD`) was equal to keystore password (`STORE_PWD`). It seems that Java doesn't support different keystore and key passwords in PKCS12 [[7](README.md#6-references)].
+**Note:** : The keystore only worked for me when the key password (`$SVR_KEY_PWD`) was equal to keystore password (`STORE_PWD`). It seems that Java doesn't support different keystore and key passwords in PKCS12 [[6](README.md#4-references)].
 
 
-## 4. Creating & Using Self-Signed Certificate Chain
+### 3.2 How to Create & Use Self-Signed Certificate Chain
 
 The following is required for creating a self-signed certificate chain:
 
@@ -96,7 +102,7 @@ The following is required for creating a self-signed certificate chain:
 
 The root CA certificate must be installed on the browser (as described in section 2.), and the server certificate should be installed in the server (as described in section 3.).
 
-**Note:** : The below steps create certificates to be used in tests with *localhost*/*127.0.0.1* domain, and browser. For other scenarios refer to OpenSSL Manpages [[8](README.md#6-references)], RFC 5280 [[9](README.md#6-references)], or other online references (e.g.: "A Web PKI x509 certificate primer" from Mozilla [[10](README.md#6-references)]).
+**Note:** : The below steps create certificates to be used in tests with *localhost*/*127.0.0.1* domain, and browser. For other scenarios refer to OpenSSL Manpages [[7](README.md#4-references)], RFC 5280 [[8](README.md#4-references)], or other online references (e.g.: "A Web PKI x509 certificate primer" from Mozilla [[9](README.md#4-references)]).
 
 
 Self-signed root/CA certificate can be created using OpenSSL commands by following the below steps:
@@ -162,31 +168,22 @@ Server certificate signed with the above created certificate can be created usin
     openssl pkcs12 -export -name netty -inkey svr_key.pem -in svr_netty.pem -out svr_netty.p12 -passin pass:$SVR_KEY_PWD -passout pass:$STORE_PWD
     ```
 
-
-## 5. Additional information
-
-This is just a personal project created for study/test purpose.
-But, if you have any question or comment, please use the Issues tab in this repository.
-
-
-## 6. References
+## 4. References
 
 [1] [Certificates and Security Best Practices](https://myarch.com/cert-book/index.html)
 
 [2] [Cryptographic Key Storage Options & Best Practices](https://www.globalsign.com/en/blog/cryptographic-key-management-and-storage-best-practice/)
 
-[3] [Netty project example: http](https://github.com/netty/netty/tree/4.1/example/src/main/java/io/netty/example/http/helloworld)
+[3] [Where to store Java keystore password?](https://security.stackexchange.com/questions/31050/where-to-store-java-keystore-password)
 
-[4] [Where to store Java keystore password?](https://security.stackexchange.com/questions/31050/where-to-store-java-keystore-password)
+[4] [How can I protect MySQL username and password from decompiling?](https://stackoverflow.com/questions/442862/how-can-i-protect-mysql-username-and-password-from-decompiling/442872#442872)
 
-[5] [How can I protect MySQL username and password from decompiling?](https://stackoverflow.com/questions/442862/how-can-i-protect-mysql-username-and-password-from-decompiling/442872#442872)
+[5] [How do I tell if my connection to a website is secure?](https://support.mozilla.org/en-US/kb/how-do-i-tell-if-my-connection-is-secure)
 
-[6] [How do I tell if my connection to a website is secure?](https://support.mozilla.org/en-US/kb/how-do-i-tell-if-my-connection-is-secure)
+[6] [Java PKCS12 Keystore generated with openssl BadPaddingException](https://stackoverflow.com/questions/32850783/java-pkcs12-keystore-generated-with-openssl-badpaddingexception)
 
-[7] [Java PKCS12 Keystore generated with openssl BadPaddingException](https://stackoverflow.com/questions/32850783/java-pkcs12-keystore-generated-with-openssl-badpaddingexception)
+[7] [OpenSSL Manpages](https://www.openssl.org/docs/manpages.html)
 
-[8] [OpenSSL Manpages](https://www.openssl.org/docs/manpages.html)
+[8] [RFC 5280](https://tools.ietf.org/html/rfc5280)
 
-[9] [RFC 5280](https://tools.ietf.org/html/rfc5280)
-
-[10] [A Web PKI x509 certificate primer](https://developer.mozilla.org/en-US/docs/Mozilla/Security/x509_Certificates)
+[9] [A Web PKI x509 certificate primer](https://developer.mozilla.org/en-US/docs/Mozilla/Security/x509_Certificates)
