@@ -12,7 +12,7 @@ This is just a personal project created for learning and testing.
 If you have any question or comment, please use the Issues tab of this git repo.
 
 
-## 2. Quick Start: Running the Project (As-Is).
+## 2. Quick Start: Running the Project As-Is
 
 To see the server in action, you will first have to install the SSL certificate as a trusted root certificate in a browser (this is necessary because the project uses the self-signed root CA certificate).
 To install the certificate in Mozilla Firefox:
