@@ -1,7 +1,5 @@
 package io.netty.example.https.security;
 
-import io.netty.example.https.util.ApplicationProperties;
-
 import java.io.IOException;
 import java.nio.channels.Channels;
 import java.nio.channels.FileChannel;
@@ -14,8 +12,10 @@ import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.UnrecoverableEntryException;
+import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
+import java.util.Objects;
 import java.util.Properties;
 
 public final class KeyStoreData {
@@ -28,26 +28,41 @@ public final class KeyStoreData {
     public static final String PKCS_12 = "PKCS12";
 
     /**
-     * Returns a keystore data object from the keystore file specified in the security configuration file.
+     * Reads data from keystore and returns a keystore data object. .
      *
-     * @param securityConfigFilePath The path of the security configuration file
-     * @return keystore data object with data from the keystore file
-     * @throws IOException
-     * @throws KeyStoreException
-     * @throws CertificateException
-     * @throws NoSuchAlgorithmException
-     * @throws UnrecoverableEntryException
+     * @param securityConfigProp property list containing the parameters necessary to retrieve the keystore data
+     * @return keystore data object
      */
-    public static KeyStoreData from(String securityConfigFilePath)
+    public static KeyStoreData from(Properties securityConfigProp)
+            throws CertificateException, UnrecoverableEntryException, NoSuchAlgorithmException, KeyStoreException,
+                   IOException {
+        return from(Objects.requireNonNull(securityConfigProp.getProperty(KEYSTORE_FILEPATH)),
+                    Objects.requireNonNull(securityConfigProp.getProperty(KEYSTORE_PASSWORD).toCharArray()),
+                    Objects.requireNonNull(securityConfigProp.getProperty(ENTRY_ALIAS)),
+                    Objects.requireNonNull(securityConfigProp.getProperty(ENTRY_KEY_PASSWORD).toCharArray()));
+    }
+
+    /**
+     * Reads data from keystore and returns a keystore data object. .
+     *
+     * @param keystoreFilePath the path of the KeyStore file
+     * @param keystorePassword the password used to check the integrity of the keystore, the password used to unlock the
+     *                         keystore,
+     * @param alias            alias of the keystore entry of interest
+     * @param entryKeyPassword the password used to protect the entry of interest
+     * @return keystore data object
+     * @throws IOException               if there is an I/O or format problem with the keystore data, if a password is
+     *                                   required but not given, or if the given password was incorrect.
+     * @throws KeyStoreException         if the keystore has not been initialized (loaded).
+     * @throws CertificateException      if any of the certificates in the keystore could not be loaded
+     * @throws NoSuchAlgorithmException  if the algorithm used to check the integrity of the keystore cannot be found
+     * @throws UnrecoverableKeyException if the entry is a {@code PrivateKeyEntry} or {@code SecretKeyEntry} and the
+     *                                   specified password is wrong.
+     */
+    public static KeyStoreData from(String keystoreFilePath, char[] keystorePassword, String alias,
+                                    char[] entryKeyPassword)
             throws IOException, KeyStoreException, CertificateException, NoSuchAlgorithmException,
                    UnrecoverableEntryException {
-
-        Properties securityConfigProp = ApplicationProperties.from(securityConfigFilePath);
-        final String keystoreFilePath = securityConfigProp.getProperty(KEYSTORE_FILEPATH);
-        final char[] keystorePassword = securityConfigProp.getProperty(KEYSTORE_PASSWORD).toCharArray();
-        final String alias = securityConfigProp.getProperty(ENTRY_ALIAS);
-        final char[] entryKeyPassword = securityConfigProp.getProperty(ENTRY_KEY_PASSWORD).toCharArray();
-
         KeyStore keyStore = KeyStore.getInstance(PKCS_12);
         try (final FileChannel keystoreFileChannel = FileChannel
                 .open(Paths.get(keystoreFilePath), StandardOpenOption.READ)) {
@@ -68,10 +83,20 @@ public final class KeyStoreData {
         this.certificateChain = certificateChain;
     }
 
+    /**
+     * Gets the {@code PrivateKey}.
+     *
+     * @return the {@code PrivateKey}
+     */
     public PrivateKey getKey() {
         return key;
     }
 
+    /**
+     * Gets the {@code Certificate} chain.
+     *
+     * @return an array of {@code Certificate}s corresponding to the certificate chain for the public key.
+     */
     public X509Certificate[] getCertificateChain() {
         return certificateChain;
     }

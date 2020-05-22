@@ -1,24 +1,30 @@
 package io.netty.example.https.util;
 
-import org.junit.Test;
 
-import java.io.IOException;
-import java.security.Security;
-import java.util.Arrays;
+import io.vavr.control.Try;
+import org.junit.jupiter.api.Test;
+
 import java.util.Properties;
 
-import static org.junit.Assert.*;
+import static org.hamcrest.MatcherAssert.*;
+import static org.hamcrest.Matchers.*;
+
 
 public class ApplicationPropertiesTest {
     @Test
-    public void test_from_simpleProperties() throws IOException {
-        Properties prop = ApplicationProperties.from("src/test/resources/application.properties");
-        assertEquals("8443", prop.getProperty("server.port"));
-        assertEquals("src/main/resources/security/config.properties", prop.getProperty("security.config.filepath"));
+    public void test_from() {
+        Try<Properties> properties = ApplicationProperties.from("src/test/resources/application.properties");
+        assertThat(properties.isSuccess(), is(true));
+        Properties p = properties.get();
+
+        assertThat(p.getProperty("local.port"), equalTo("8443"));
+        assertThat(p.getProperty("security.config.filepath"),
+                   equalTo("src/main/resources/security/security-config.properties"));
     }
 
     @Test
-    public void test() {
-        System.out.println(Arrays.toString(Security.getProviders()));
+    public void test_from_failure() {
+        Try<Properties> properties = ApplicationProperties.from("dd");
+        assertThat(properties.isFailure(), is(true));
     }
 }

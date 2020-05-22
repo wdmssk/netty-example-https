@@ -18,7 +18,7 @@ Configuration:
       name: RollingFile-Appender
       PatternLayout:
         pattern: ${DefaultPattern}
-      fileName: ${log-path}/${logFile}
+      fileName: ${logPath}/${logFile}
       filePattern: ${logPath}/${logFile}.%d{MM-dd-yy-HH-mm-ss}-%i.gz
       Policies:
         SizeBasedTriggeringPolicy:
@@ -27,9 +27,9 @@ Configuration:
         max: '30'
   Loggers:
     Root:
-      level: debug
+      level: info
       AppenderRef:
         - ref: Console-Appender
-          level: debug
+          level: info
         - ref: RollingFile-Appender
-          level: debug
+          level: info
