@@ -13,7 +13,7 @@
  * License for the specific language governing permissions and limitations
  * under the License.
  */
-package io.netty.example.https.helloworld;
+package io.netty.https.handler;
 
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelPipeline;
@@ -22,11 +22,11 @@ import io.netty.handler.codec.http.HttpServerCodec;
 import io.netty.handler.codec.http.HttpServerExpectContinueHandler;
 import io.netty.handler.ssl.SslContext;
 
-public class HttpsHelloWorldServerInitializer extends ChannelInitializer<SocketChannel> {
+public class HttpsChannelInitializer extends ChannelInitializer<SocketChannel> {
 
     private final SslContext sslCtx;
 
-    public HttpsHelloWorldServerInitializer(SslContext sslCtx) {
+    public HttpsChannelInitializer(SslContext sslCtx) {
         this.sslCtx = sslCtx;
     }
 
@@ -38,6 +38,6 @@ public class HttpsHelloWorldServerInitializer extends ChannelInitializer<SocketC
         }
         p.addLast(new HttpServerCodec());
         p.addLast(new HttpServerExpectContinueHandler());
-        p.addLast(new HttpsHelloWorldServerHandler());
+        p.addLast(new HttpsHandler());
     }
 }

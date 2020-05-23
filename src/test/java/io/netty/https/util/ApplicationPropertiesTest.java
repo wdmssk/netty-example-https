@@ -1,4 +1,4 @@
-package io.netty.example.https.util;
+package io.netty.https.util;
 
 
 import io.vavr.control.Try;

@@ -1,4 +1,4 @@
-package io.netty.example.https.security;
+package io.netty.https.security;
 
 import java.io.IOException;
 import java.nio.channels.Channels;

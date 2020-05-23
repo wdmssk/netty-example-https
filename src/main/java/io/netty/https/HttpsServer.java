@@ -1,4 +1,4 @@
-package io.netty.example.https;
+package io.netty.https;
 
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.Channel;
@@ -6,7 +6,7 @@ import io.netty.channel.ChannelOption;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
-import io.netty.example.https.helloworld.HttpsHelloWorldServerInitializer;
+import io.netty.https.handler.HttpsChannelInitializer;
 import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
 import io.netty.handler.ssl.SslContext;
@@ -29,7 +29,7 @@ public final class HttpsServer {
             b.group(bossGroup, workerGroup)
              .channel(NioServerSocketChannel.class)
              .handler(new LoggingHandler(LogLevel.INFO))
-             .childHandler(new HttpsHelloWorldServerInitializer(sslCtx));
+             .childHandler(new HttpsChannelInitializer(sslCtx));
 
             Channel ch = b.bind(localPort).sync().channel();
             logger.info("Open your web browser and navigate to https://127.0.0.1:{}/", localPort);

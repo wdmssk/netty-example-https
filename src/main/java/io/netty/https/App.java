@@ -1,7 +1,7 @@
-package io.netty.example.https;
+package io.netty.https;
 
-import io.netty.example.https.security.KeyStoreData;
-import io.netty.example.https.util.ApplicationProperties;
+import io.netty.https.security.KeyStoreData;
+import io.netty.https.util.ApplicationProperties;
 import io.netty.handler.ssl.SslContext;
 import io.netty.handler.ssl.SslContextBuilder;
 import io.vavr.control.Try;

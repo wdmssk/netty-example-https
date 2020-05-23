@@ -8,7 +8,7 @@ sourceCompatibility = 1.11
 group = 'io.netty.https'
 archivesBaseName = 'nettyHttps'
 version = '1.0-SNAPSHOT'
-mainClassName = 'io.netty.example.https.App'
+mainClassName = 'io.netty.https.App'
 
 repositories {
     mavenCentral()
