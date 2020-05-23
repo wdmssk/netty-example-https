@@ -70,7 +70,7 @@ public final class App implements Callable<Integer> {
         return ApplicationProperties.from(securityConfFilePath)
                                     .flatMap(securityConfigProp -> Try.of(() -> KeyStoreData.from(securityConfigProp))
                                                                       .onFailure(ex -> System.err.println(
-                                                                              "KeyStore data read failed, Error message: " +
+                                                                              "KeyStore data read failed. Error message: " +
                                                                               ex.getMessage())));
     }
 
@@ -79,6 +79,6 @@ public final class App implements Callable<Integer> {
                                                         keyStoreData.getCertificateChain())
                                              .build())
                   .onFailure(
-                          ex -> System.err.println("SslContext creation failed, Error message: " + ex.getMessage()));
+                          ex -> System.err.println("SslContext creation failed. Error message: " + ex.getMessage()));
     }
 }
