@@ -13,7 +13,7 @@ import static org.hamcrest.Matchers.*;
 public class ApplicationPropertiesTest {
     @Test
     public void test_from() {
-        Try<Properties> properties = ApplicationProperties.from("src/test/resources/application.properties");
+        Try<Properties> properties = ApplicationProperties.from("src/test/resources/security-application.properties");
         assertThat(properties.isSuccess(), is(true));
         Properties p = properties.get();
 
