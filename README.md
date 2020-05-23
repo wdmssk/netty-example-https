@@ -3,9 +3,9 @@
 
 ## 1. Description
 
-The repo includes:
-* notes on certificates and security best practices
-* implementation of a Netty HTTPS/SSL server for reference
+This repo includes:
+* notes about certificates and security best practices
+* Netty HTTPS/SSL server reference implementation
 
 The code is based on the [example code that comes with Netty](https://github.com/netty/netty/tree/4.1/example/src/main/java/io/netty/example/http/helloworld).
 This is just a personal project created for learning and testing.
