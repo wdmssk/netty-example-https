@@ -27,7 +27,7 @@ If you have any question or comment, please use the Issues tab of this git repo.
     "Fat-jar" file is created (via gradle [`shadowJar`](https://imperceptiblethoughts.com/shadow/) plugin) when the project is built.
     Run the following command in the project root directory.
     ````bash
-    ./gradle clean build
+./gradle clean build
     ````
     The "fat-jar" will be created as `build/libs//nettyHttps-<version>-all.jar`.
 
@@ -37,7 +37,7 @@ If you have any question or comment, please use the Issues tab of this git repo.
 
     To start the HTTPS server run the below command.
     ````bash
-    java -jar nettyHttps-<version>-all.jar
+java -jar nettyHttps-<version>-all.jar
     ````
 
 4. Access the Server.
