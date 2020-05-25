@@ -5,49 +5,34 @@ import io.netty.https.util.ApplicationProperties;
 import io.netty.handler.ssl.SslContext;
 import io.netty.handler.ssl.SslContextBuilder;
 import io.vavr.control.Try;
-import picocli.CommandLine;
-import picocli.CommandLine.Command;
-import picocli.CommandLine.Option;
 
 import java.util.Objects;
 import java.util.Properties;
-import java.util.concurrent.Callable;
 
 
-@Command(name = "nettyHttps-1.0-SNAPSHOT-all.jar", mixinStandardHelpOptions = true, version = "1.0-SNAPSHOT",
-        description = "An HTTPS server that sends back the content of the received HTTP request.")
-public final class App implements Callable<Integer> {
+public final class App {
+    private static final String CONFIG_FILEPATH = "src/main/resources/application.properties";
 
     public static final String LOCAL_PORT = "local.port";
     public static final String SECURITY_CONFIG_FILEPATH = "security.config.filepath";
 
-    @Option(names = { "-c", "--config" }, description = "Path of the configuration file.")
-    private String configFilePath = "src/main/resources/application.properties";
-
-    public static void main(String[] args) {
-        int exitCode = new CommandLine(new App()).execute(args);
-        System.exit(exitCode);
-    }
-
-    @Override
-    public Integer call() throws InterruptedException {
-        final Try<Properties> p = ApplicationProperties.from(configFilePath);
+    public static void main(String[] args) throws InterruptedException {
+        final Try<Properties> p = ApplicationProperties.from(CONFIG_FILEPATH);
         if (p.isFailure()) {
-            return 1;
+            System.exit(1);
         }
 
         final Try<Integer> localPort = getServerPort(p.get());
         if (localPort.isFailure()) {
-            return 1;
+            System.exit(1);
         }
 
         Try<SslContext> sslContext = getSslContext(p.get());
         if (sslContext.isFailure()) {
-            return 1;
+            System.exit(1);
         }
 
         HttpsServer.start(sslContext.get(), localPort.get());
-        return 0;
     }
 
     private static Try<Integer> getServerPort(Properties properties) {
