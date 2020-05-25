@@ -4,60 +4,58 @@
 ## 1. Description
 
 This repo includes:
-* notes about certificate and keystore best practices.
-* a reference implementation of a Netty HTTPS/SSL server
+* notes about certificate and keystore management best practices (relevant for server implementation)
+* a sample implementation of a Netty HTTPS/SSL server
 
 The code is based on the [example code that comes with Netty](https://github.com/netty/netty/tree/4.1/example/src/main/java/io/netty/example/http/helloworld).
 This is just a personal project created for learning and testing.
 If you have any question or comment, please use the Issues tab of this git repo.
 
 
-## 2. Quick Start: Running the Project As-Is
+## 2. Building, Running, Testing
 
-1. Install the SSL certificate as a trusted root certificate in a browser.
+Follow below steps to test the sample implementation:
 
-    This is necessary if you are using a self-signed root CA certificate (as that provided in the project).
-    For e.g., to install the certificate in Mozilla Firefox:
-    - Click Preferences > Privacy & Security > View Certificates > Authorities tab > Import
-    - Navigate to where you stored the certificate, and select the certificate file (If you are using certificates included in the project, you should select `ca_netty.pem` in src/main/resources/security/* folder).`
+### 1. Install the SSL certificate as a trusted root certificate in a browser.
+This is necessary if you are using a self-signed root CA certificate (as that included in the project).
+For e.g., to install the certificate in Mozilla Firefox:
+- Click Preferences > Privacy & Security > View Certificates > Authorities tab > Import
+- Navigate to where you stored the certificate, and select the certificate file (If you are using certificates included in the project, you should select `ca_netty.pem` in src/main/resources/security/* folder).`
 
+### 2. Build the jar file.
+"Fat-jar" file is created (via gradle [`shadowJar`](https://imperceptiblethoughts.com/shadow/) plugin) when the project is built.
+Run the following command in the project root directory.
+````bash
+./gradle clean build
+````
+The "fat-jar" will be created as `build/libs//nettyHttps-<version>-all.jar`.
 
-2. Build the jar file.
+### 3. Start the HTTPS Server.
+Update the application.properties file in the src/main/resources folder with the path of the Keystore configuration file, and the server port.
 
-    "Fat-jar" file is created (via gradle [`shadowJar`](https://imperceptiblethoughts.com/shadow/) plugin) when the project is built.
-    Run the following command in the project root directory.
-    ````bash
-    ./gradle clean build
-    ````
-    The "fat-jar" will be created as `build/libs//nettyHttps-<version>-all.jar`.
+To start the HTTPS server run the below command.
+````bash
+java -jar nettyHttps-<version>-all.jar
+````
 
-3. Start the HTTPS Server.
+### 4. Access the Server.
+Open browser on page *https://localhost:8443* (or *https://127.0.0.1:8443*).
 
-    Update the application.properties file in the src/main/resources folder with the path of the Keystore configuration file, and the server port.
-
-    To start the HTTPS server run the below command.
-    ````bash
-    java -jar nettyHttps-<version>-all.jar
-    ````
-
-4. Access the Server.
-
-    Open browser on page *https://localhost:8443* (or *https://127.0.0.1:8443*).
-
-    If everything is correct one should see a "Hello world!" message in your browser and a gray padlock (indicating a trustworthy SSL/TLS connection).
-    If something is wrong, the browser will display the "Warning: Potential Security Risk Ahead" error page with error codes (that should help to trace the error's cause.).
-    (see [How do I tell if my connection to a website is secure?](https://support.mozilla.org/en-US/kb/how-do-i-tell-if-my-connection-is-secure))
-
+If everything is correct one should see a "Hello world!" message in your browser and a gray padlock (indicating a trustworthy SSL/TLS connection).
+If something is wrong, the browser will display the "Warning: Potential Security Risk Ahead" error page with error codes (see [How do I tell if my connection to a website is secure?](https://support.mozilla.org/en-US/kb/how-do-i-tell-if-my-connection-is-secure)).
+<br/><br/>
 
 A production project __SHOULD NOT INCLUDE__ keystore or keystore configuration parameters.
 Including them in the project is against the certificate and keystore best practices.
 The *src/main/resources/security* directory contains the keystore (*svr_netty.p12* - containing the server private key, and certificate), and Keystore configuration file (*security-config.properties*).
-These files were only included for allowing to quickly test the server.
+These files were included in the sample project to enable quick tests and experiments.
 
-The keys, certificates, and keystore in *src/main/resources/security* directory were generated as described in section 3.2.
+The keys, certificates, and keystore in *src/main/resources/security* directory were generated as described in section 3.3.
 
 
-## 3. Security Best Practices and Netty HTTPS Server
+## 3. How to to Create a Netty HTTPS Server
+
+### 3.1 Certificate and Keystore Management Best Practices
 
 Best practices for certificates and security [[1](README.md#4-references), [2](README.md#4-references)] is to secure the private keys.
 HSM (hardware security module), secret manager, and keystore files can be used to secure the keys.
@@ -68,17 +66,17 @@ Other relevant certificates and security best practices [[1](README.md#4-referen
 - Use standard operating system access security protocols to protect keystore files and keystore configuration files (including passwords).
 - Use the PKCS12 Format for keystores.
 
-The repository source code is intended to be used as reference for implementing a Netty HTTPS/SSL server using keystore.
-The following topics provide additional information necessary to implement a Netty HTTPS server based on best practices.
+The sample implementation is intended to be used as reference for implementing a Netty HTTPS/SSL server using keystore.
+The following topics provide additional information necessary to implement a Netty HTTPS server compliant with the best practices.
 
 
-### 3.1 How to to Create a Netty HTTPS Server
+### 3.2 General Structure of a Netty HTTPS Server
 To create a Netty HTTPS server, the following is required:
 
 - Keystore with server private key and certificate signed by CA. In the project, *src/main/resources/security/svr_netty.p12* is the keystore file.
 - Keystore configuration file containing the data needed to access the keystore data. The file should contain the keystore file path, the keystore password, entry alias (for private key and certificate pair), and private key password. In the project, *src/main/resources/security/config.properties* is the keystore configuration file.
-- File containing path of the keystore configuration file, and logic to extract this path. In the project, the path is contained in *src/main/resources/application.properties*, and the *io.netty.example.https.helloworld.HttpsHelloWorldServer* class extracts the path using *io.netty.example.https.util.ApplicationProperties* class.
-- Logic to extract the private key and certificate from keystore using the data in keystore configuration file. The key and certificate are necessary to create the *io.netty.handler.ssl.SslContext* for the Netty server. In the project, *io.netty.example.https.security.KeyStoreData* class extracts the private key and certificate, and *io.netty.handler.ssl.SslContext* is created in the *io.netty.example.https.helloworld.HttpsHelloWorldServer* class.
+- File containing path of the keystore configuration file, and logic to extract this path. In the project, the path is contained in *src/main/resources/application.properties*, and the *io.netty.https.App* class extracts the path using *io.netty.https.util.ApplicationProperties* class.
+- Logic to extract the private key and certificate from keystore using the data in keystore configuration file. The key and certificate are necessary to create the *io.netty.handler.ssl.SslContext* for the Netty server. In the project, *io.netty.https.security.KeyStoreData* class extracts the private key and certificate, and *io.netty.handler.ssl.SslContext* is created in the *io.netty.https.App* class.
 
 The keystore file and keystore parameters configuration file should be external to the Java/Netty project.
 Also, these files should be owned by and accessible only to the account used to run the server.
@@ -114,7 +112,7 @@ openssl pkcs12 -export -name netty -inkey svr_key.pem -in svr_netty.pem -out svr
 **Note:** : The keystore only worked for me when the key password (`$SVR_KEY_PWD`) was equal to keystore password (`STORE_PWD`). It seems that Java doesn't support different keystore and key passwords in PKCS12 [[5](README.md#4-references)].
 
 
-### 3.2 How to Create & Use Self-Signed Certificate Chain
+### 3.3 How to Create & Use Self-Signed Certificate Chain
 
 The following is required for creating a self-signed certificate chain:
 
