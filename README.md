@@ -73,7 +73,6 @@ The following subsections provide additional information necessary to implement 
 
 
 ### 3.2 General Structure of a Netty HTTPS Server
-
 The following is required to create a Netty HTTPS server,
 
 1. Keystore with server private key and certificate signed by CA.
@@ -92,7 +91,7 @@ In the project, these correspond to:
 **Note:** : Ideally keystore configuration data should be stored in an external system (e.g.: secret manager), and retrieved at startup.
 
 
-### 3.3 Creating and Managing the Keystore
+### 3.3 Keystore Creation and Management
 To obtain a CA signed SSL certificate, you must create a private key, use that key to create a CSR (certificate signing request), and submit the CSR to be signed by an authorized CA.
 Follow the below steps to create CSR using the OpenSSL:
 
@@ -203,8 +202,3 @@ Server certificate signed with the above created certificate can be created usin
     ```bash
     openssl pkcs12 -export -name netty -inkey svr_key.pem -in svr_netty.pem -out svr_netty.p12 -passin pass:$SVR_KEY_PWD -passout pass:$STORE_PWD
     ```
-
-
-
-
-
