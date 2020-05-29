@@ -89,17 +89,10 @@ In the project, these correspond to:
 4. the private key and certificate are extracted by the methods in `io.netty.https.App` and `io.netty.https.security.KeyStoreData` classes.
 `io.netty.handler.ssl.SslContext` is created by the `getSslContext(KeyStoreData keyStoreData)` method of the `io.netty.https.App` class.
 
+**Note:** : Ideally keystore configuration data should be stored in an external system (e.g.: secret manager), and retrieved at startup.
+
 
 ### 3.3 Creating and Managing the Keystore
-The keystore file and keystore parameters configuration file should be external to the Java/Netty project.
-Also, these files should be owned by and accessible only to the account used to run the server.
-This can be achieved changing the file owners, and making them read-only:
-
-```bash
-chown account_id config.properties svr_netty.p12
-chmod 400 config.properties svr_netty.p12
-```
-
 To obtain a CA signed SSL certificate, you must create a private key, use that key to create a CSR (certificate signing request), and submit the CSR to be signed by an authorized CA.
 Follow the below steps to create CSR using the OpenSSL:
 
@@ -124,6 +117,15 @@ openssl pkcs12 -export -name netty -inkey svr_key.pem -in svr_netty.pem -out svr
 
 **Note:** : The keystore only worked for me when the key password (`$SVR_KEY_PWD`) was equal to keystore password (`STORE_PWD`). It seems that Java doesn't support different keystore and key passwords in PKCS12
 (see: [Java PKCS12 Keystore generated with openssl BadPaddingException](https://stackoverflow.com/questions/32850783/java-pkcs12-keystore-generated-with-openssl-badpaddingexception)).
+
+The keystore file and keystore parameters configuration file should be external to the Java/Netty project.
+Also, these files should be owned by and accessible only to the account used to run the server.
+This can be achieved changing the file owners, and making them read-only:
+
+```bash
+chown account_id config.properties svr_netty.p12
+chmod 400 config.properties svr_netty.p12
+```
 
 
 ### 3.4 How to Create & Use Self-Signed Certificate Chain
