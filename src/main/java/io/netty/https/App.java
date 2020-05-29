@@ -11,13 +11,13 @@ import java.util.Properties;
 
 
 public final class App {
-    private static final String CONFIG_FILEPATH = "src/main/resources/application.properties";
+    private static final String CONFIG_FILEPATH = "/application.properties";
 
     public static final String LOCAL_PORT = "local.port";
     public static final String SECURITY_CONFIG_FILEPATH = "security.config.filepath";
 
     public static void main(String[] args) throws InterruptedException {
-        final Try<Properties> p = ApplicationProperties.from(CONFIG_FILEPATH);
+        final Try<Properties> p = ApplicationProperties.from(App.class, CONFIG_FILEPATH);
         if (p.isFailure()) {
             System.exit(1);
         }
@@ -52,7 +52,7 @@ public final class App {
     }
 
     private static Try<KeyStoreData> getKeyStoreData(String securityConfFilePath) {
-        return ApplicationProperties.from(securityConfFilePath)
+        return ApplicationProperties.from(App.class, securityConfFilePath)
                                     .flatMap(securityConfigProp -> Try.of(() -> KeyStoreData.from(securityConfigProp))
                                                                       .onFailure(ex -> System.err.println(
                                                                               "KeyStore data read failed. Error message: " +
