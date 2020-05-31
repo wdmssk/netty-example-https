@@ -92,8 +92,11 @@ In the project, these correspond to:
 
 
 ### 3.3 Keystore Creation and Management
+
+The keystore should be created importing certificate signed by CA, and and private key.
+
 To obtain a CA signed SSL certificate, you must create a private key, use that key to create a CSR (certificate signing request), and submit the CSR to be signed by an authorized CA.
-Follow the below steps to create CSR using the OpenSSL:
+The private key, and CSR can be created with the following commands using OpenSSL.
 
 1. Create the server's private key:
 
@@ -109,16 +112,17 @@ Follow the below steps to create CSR using the OpenSSL:
     ```
 
 After getting the signed certificate from the CA, it should be imported with the private key into keystore.
-The key and certificate can be imported using the OpenSSL:
+This can also be done using the using the OpenSSL:
 ```bash
 openssl pkcs12 -export -name netty -inkey svr_key.pem -in svr_netty.pem -out svr_netty.p12 -passin pass:$SVR_KEY_PWD -passout pass:$STORE_PWD
 ```
 
-**Note:** : The keystore only worked for me when the key password (`$SVR_KEY_PWD`) was equal to keystore password (`STORE_PWD`). It seems that Java doesn't support different keystore and key passwords in PKCS12
-(see: [Java PKCS12 Keystore generated with openssl BadPaddingException](https://stackoverflow.com/questions/32850783/java-pkcs12-keystore-generated-with-openssl-badpaddingexception)).
+**Note:** : The keystore only worked for me when the key password (`$SVR_KEY_PWD`) was equal to keystore password (`STORE_PWD`).
+It seems that Java doesn't support different keystore and key passwords in PKCS12 (see: [Java PKCS12 Keystore generated with openssl BadPaddingException](https://stackoverflow.com/questions/32850783/java-pkcs12-keystore-generated-with-openssl-badpaddingexception)).
 
-The keystore file and keystore parameters configuration file should be external to the Java/Netty project.
-Also, these files should be owned by and accessible only to the account used to run the server.
+The keystore file and keystore parameters configuration file should be external to the Java/Netty project
+(as mentioned before, ideally the keystore configuration data should be stored in an external system).
+These files should be owned by and accessible only to the account used to run the server.
 This can be achieved changing the file owners, and making them read-only:
 
 ```bash
