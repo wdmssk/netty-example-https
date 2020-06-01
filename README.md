@@ -133,18 +133,17 @@ chmod 400 config.properties svr_netty.p12
 
 ### 3.4 How to Create & Use Self-Signed Certificate Chain
 
-The following is required for creating a self-signed certificate chain:
+To create a self-signed certificate chain, one should go through the following steps:
+- Create the self-signed root CA certificate.
+- Create the server certificate, and sign it with the self-signed root CA certificate.
 
-- Self-signed root CA certificate.  
-- Server certificate signed with the self-signed root CA certificate.
-
-The root CA certificate must be installed on the browser (as described in section 2.), and the server certificate should be installed in the server (as described in section 3.).
+The root CA certificate should be installed in the browser (as described in 2.), and the server certificate should be imported to the keystore (as described in 3.3).
 
 **Note:** : The below steps create certificates to be used in tests with *localhost*/*127.0.0.1* domain, and browser.
 For other scenarios refer to [OpenSSL Manpages](https://www.openssl.org/docs/manpages.html), [RFC 5280](https://tools.ietf.org/html/rfc5280), or other online references
 (e.g.: [A Web PKI x509 certificate primer](https://developer.mozilla.org/en-US/docs/Mozilla/Security/x509_Certificates) from  Mozilla).
 
-Self-signed root/CA certificate can be created using OpenSSL commands by following the below steps:
+To create the self-signed root/CA certificate using OpenSSL, follow the below steps:
 
 1. Create the root CA private key:
 
@@ -172,8 +171,7 @@ Self-signed root/CA certificate can be created using OpenSSL commands by followi
     openssl x509 -req -sha256 -days 3650 -in ca_netty.csr -signkey ca_key.pem -set_serial $ANY_SMALL_INTEGER -extfile ca_netty.cnf -out ca_netty.pem -passin pass:$CA_KEY_PWD
     ```
 
-Server certificate signed with the above created certificate can be created using OpenSSL commands by following the below steps:
-
+To create the server certificate, and sign it with the self-signed root CA certificate using OpenSSL, follow the below steps:
 
 1. Create the server's private key:
 
@@ -199,10 +197,4 @@ Server certificate signed with the above created certificate can be created usin
 
     ```bash
     openssl x509 -req -sha256 -days 1096 -in svr_netty.csr -CAkey ca_key.pem -CA ca_netty.pem -set_serial $SOME_LARGE_INTEGER -out svr_netty.pem -extfile svr_netty.cnf -passin pass:$CA_KEY_PWD
-    ```
-
-5. Create the PKCS12 Keystore from server's private key and certificate
-
-    ```bash
-    openssl pkcs12 -export -name netty -inkey svr_key.pem -in svr_netty.pem -out svr_netty.p12 -passin pass:$SVR_KEY_PWD -passout pass:$STORE_PWD
     ```
